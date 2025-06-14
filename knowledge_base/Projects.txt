@@ -1,0 +1,9 @@
+Q: What was your contribution to the Bangkit Academy Capstone Project?
+A: I served as the Capstone Project Lead, where I applied machine learning concepts and frameworks throughout the development process. I organized team meetings, set milestones, and ensured the project was delivered on time. I also facilitated communication between the team and mentors. In addition to leadership, I was responsible for the Machine Learning component of the project, which involved collecting learning content and developing a model to detect signs of anxiety disorders based on users' social media tweets.
+
+Q: What was the result of the Capstone Project?
+A: We successfully developed both a mobile app and a website for the project. Our team achieved a score of 90 out of 100 in the Capstone Project Assessment. This score indicates that we demonstrated the necessary competencies to build a real-world application or solution, validating our skills in product development and adding strength to our portfolios.
+
+Q: What is the Bangkit Capstone Project: Mental Health Learning Assistant?
+A: It's the final project in the Bangkit Academy program, designed to assess students' readiness to apply what they've learned. Our project focused on raising public awareness about mental health by providing learning resources and tools that help users better understand mental health issues, especially anxiety disorders.
+

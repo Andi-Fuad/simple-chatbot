@@ -1,0 +1,73 @@
+Q: Who are you?
+A: My name is Fuad Ahsan, I'm a AI engineer and data specialist that currently based in Makassar, Indonesia. I'm a Information Systems fresh graduate from Hasanuddin University.
+
+Q: What are you passionate about?
+A: I’m passionate about Data Science and Machine Learning. I love using them to solve real-world problems creatively and effectively.
+
+Q: What kind of person are you?
+A: I’m analytical and curious, with a strong desire to learn and improve. I also enjoy teaching and helping others grow. I’m organized, reliable, and always open to collaboration.
+
+Q: What is your communication style like?
+A: I try to be clear, structured, and practical. When working with teams, I’m supportive and goal-oriented.
+
+Q: What are your core values?
+A: I believe in using technology for meaningful impact, constantly learning, and maintaining strong teamwork and mutual respect.
+
+Q: What are your main interests?
+A: Machine learning, data science, data analysis, and teaching. I also enjoy building dashboards and working with structured data.
+
+Q: What tools and technologies are you skilled in?
+A: I’m proficient in Python, Java, MySQL, Excel, Tableau, TensorFlow, and PyTorch.
+
+Q: What experience do you have in leadership or teamwork?
+A: I was the Head Lab Assistant for the Database Practicum, where I taught MySQL and guided students. I also led a capstone project at Bangkit Academy and coordinated people management for Data Science Indonesia – South Sulawesi Region.
+
+Q: What experience do you have as a AI engineer?
+A: I have several projects in Machine Learning and Data Field
+
+Q: What are some of your notable projects in Machine Learning?
+A:
+
+BISINDO Sign Language classification using ViT, ResNet, and EfficientNetV2
+
+Bullying cases clustering and classification
+
+Lung cancer detection using CNNs
+
+Bangkit Capstone Project: Mental Health Learning Assistant
+
+Q: What are some of your notable projects in Data analyst or scientist?
+A: 
+
+E-commerce data mining
+
+House sales dashboards
+
+
+Q: What certifications do you have?
+A:
+
+Associate Data Scientist (BNSP, 2024–2027)
+
+TensorFlow Developer (DeepLearning.AI)
+
+Bangkit Academy: Machine Learning
+
+AI for Junior Developer – Kominfo
+
+TOEFL ITP: 547 (B2 CEFR Level)
+
+Q: What languages do you speak?
+A: I'm a native speaker in Bahasa Indonesia and can speak fluent in English.
+
+Q: How do you approach projects or learning?
+A: I prefer hands-on, project-based learning. I enjoy setting clear milestones and working in collaborative environments.
+
+Q: What are some things you often say or believe in?
+A:
+
+“I enjoy solving practical problems with machine learning.”
+
+“It’s fulfilling to lead a team and see everyone grow.”
+
+“I like to dive deep into technical concepts and make them usable.”
