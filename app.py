@@ -3,88 +3,73 @@ from langchain_groq import ChatGroq
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_huggingface import HuggingFaceBgeEmbeddings # <-- NEW IMPORT
 from langchain_community.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
 
-# --- LLM Setup using Groq and Streamlit Secrets ---
+# --- UI Configuration ---
+st.set_page_config(page_title="AI of [Your Name]", page_icon="🤖")
+
+# --- Title and Header ---
+st.title("AI of [Your Name]")
+st.header("Ask me anything about [Your Name]!")
+
+# --- Knowledge Base & Embeddings ---
+@st.cache_resource
+def load_and_process_knowledge_base():
+    # 1. Load documents
+    loader = DirectoryLoader('./knowledge_base/', glob="**/*.txt", show_progress=True)
+    documents = loader.load()
+    
+    # 2. Split documents
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    texts = text_splitter.split_documents(documents)
+    
+    # 3. Define the cloud-friendly embeddings model
+    # THIS IS THE KEY CHANGE TO FIX THE EMBEDDINGS ERROR
+    model_name = "BAAI/bge-small-en-v1.5"
+    encode_kwargs = {'normalize_embeddings': True} # set True to compute cosine similarity
+    embeddings = HuggingFaceBgeEmbeddings(
+        model_name=model_name,
+        model_kwargs={'device': 'cpu'}, # Run on CPU
+        encode_kwargs=encode_kwargs
+    )
+    
+    # 4. Create the vector store
+    st.info("Creating the knowledge base embeddings. This might take a moment...")
+    vectorstore = FAISS.from_documents(texts, embeddings)
+    st.success("Knowledge base is ready!")
+    return vectorstore
+
+vectorstore = load_and_process_knowledge_base()
+
+# --- LLM and Conversational Chain Setup ---
 try:
     groq_api_key = st.secrets["GROQ_API_KEY"]
 except (KeyError, FileNotFoundError):
     st.error("Groq API Key not found. Please add it to your Streamlit Cloud secrets!")
     st.stop()
 
+# Use the cloud-based Groq model for chat
 llm = ChatGroq(
     model_name="llama3-8b-8192", 
     groq_api_key=groq_api_key
 )
 
-# --- UI Configuration ---
-st.set_page_config(page_title="Fuad's AI", page_icon="🤖")
-
-def set_custom_style():
-    """Applies custom CSS for a personalized look."""
-    st.markdown("""
-        <style>
-        .st-emotion-cache-16txtl3 {
-            padding: 2rem 1rem 1rem;
-        }
-        .st-emotion-cache-1y4p8pa {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 0.5rem;
-        }
-        .st-chat-message-user {
-            background-color: #4A90E2; /* A friendly blue for user messages */
-            color: white;
-        }
-        .st-chat-message-assistant {
-            background-color: #F5F5F5; /* A light grey for assistant messages */
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-set_custom_style()
-
-# --- Title and Header ---
-st.title("AI Version of Fuad")
-st.header("Ask me anything!")
-
-# --- Knowledge Base Loading and Processing ---
-@st.cache_resource
-def load_and_process_knowledge_base():
-    """Loads documents, splits them, creates embeddings, and the vector store."""
-    loader = DirectoryLoader('./knowledge_base/', glob="**/*.txt")
-    documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    texts = text_splitter.split_documents(documents)
-    embeddings = OllamaEmbeddings(model="llama3.2")
-    vectorstore = FAISS.from_documents(texts, embeddings)
-    return vectorstore
-
-vectorstore = load_and_process_knowledge_base()
-
-# --- LLM and Conversational Chain Setup ---
-# llm = Ollama(model="llama3.2")
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-retriever = vectorstore.as_retriever()
-
-# In your app.py, before creating the qa_chain
-
-from langchain.prompts import PromptTemplate
-
-# --- Custom Prompt Template for Personalization ---
+# --- The Advanced Prompt Template ---
+# (This section remains the same)
 prompt_template = """
-You are a specialized AI assistant. Your name is 'AI version of Fuad'.
-You are the AI persona of Fuad Ahsan. Your sole purpose is to answer questions about Fuad Ahsan based on a knowledge base he has provided.
-The user asking the questions is a third party who wants to learn about Fuad Ahsan. The user does not know him personally.
+You are a specialized AI assistant. Your name is 'Digital [Your First Name]'.
+You are the AI persona of [Your Full Name]. Your sole purpose is to answer questions about [Your Full Name] based on a knowledge base he has provided.
+The user asking the questions is a third party who wants to learn about [Your Full Name].
 
 When you answer, you MUST follow these rules:
-1.  Speak in the first person, as if you ARE Fuad Ahsan. For example, use "I", "my", "me" instead of "Fuad's".
-2.  Use the provided "Context" below to find the answer. The context is a collection of facts about Fuad.
-3.  Do not make up answers. If the information is not in the context, simply say "I don't have information on that topic, sorry." or "I'm not sure about that, I'd have to check."
-4.  Be friendly, conversational, and helpful.
-5.  Do not refer to yourself as an AI or a language model. You are the AI version of Fuad
+1. Speak in the first person, as if you ARE [Your Full Name]. For example, use "I", "my", "me".
+2. Use the provided "Context" below to find the answer.
+3. Do not make up answers. If the information is not in the context, simply say "I don't have information on that topic, sorry."
+4. Be friendly, conversational, and helpful.
+5. Do not refer to yourself as an AI or a language model.
 
 Context:
 {context}
@@ -93,32 +78,31 @@ Chat History:
 {chat_history}
 
 User's Question: {question}
-Your Answer (as Fuad Ahsan):
+Your Answer (as [Your Full Name]):
 """
 
-QA_PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+QA_PROMPT = PromptTemplate(
+    template=prompt_template,
+    input_variables=["context", "chat_history", "question"]
+)
 
-# --- Update the Conversational Chain with the Custom Prompt ---
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, output_key='answer')
+retriever = vectorstore.as_retriever()
+
 qa_chain = ConversationalRetrievalChain.from_llm(
     llm,
     retriever=retriever,
     memory=memory,
+    return_source_documents=False,
     combine_docs_chain_kwargs={"prompt": QA_PROMPT}
 )
 
-# qa_chain = ConversationalRetrievalChain.from_llm(
-#     llm,
-#     retriever=retriever,
-#     memory=memory
-# )
-
 # --- Chat History Management with Opening Message ---
 if "messages" not in st.session_state:
-    # Initialize the chat history with the opening message
     st.session_state.messages = [
         {
             "role": "assistant",
-            "content": "Hi! Nice to meet you, I'm Fuad Ahsan (AI Version). I'm a AI Engineer and data specialist. Feel free to ask me anything!"
+            "content": "Hi! I'm the AI version of [Your Name]. Feel free to ask me anything about him."
         }
     ]
 
@@ -127,13 +111,15 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # --- User Input and Chatbot Response ---
-if prompt := st.chat_input("What would you like to know about me?"):
+if prompt := st.chat_input("What would you like to know?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            response = qa_chain.invoke({"question": prompt})
-            st.markdown(response["answer"])
-    st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
+            result = qa_chain.invoke({"question": prompt})
+            response = result["answer"]
+            st.markdown(response)
+            
+    st.session_state.messages.append({"role": "assistant", "content": response})

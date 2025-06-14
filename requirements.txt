@@ -1,6 +1,7 @@
 streamlit
 langchain
 langchain-community
-langchain-groq
 faiss-cpu
-unstructured
+langchain-groq
+langchain-huggingface
+sentence-transformersunstructured
