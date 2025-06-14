@@ -7,6 +7,22 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
 
+# --- LLM Setup using Groq and Streamlit Secrets ---
+try:
+    # This is the standard way to access secrets in a deployed app
+    groq_api_key = st.secrets["GROQ_API_KEY"]
+except FileNotFoundError:
+    # Fallback for local development if you don't have a secrets file
+    st.info("Groq API Key not found in secrets. Please add it to your Streamlit secrets.")
+    # You can optionally use an environment variable or input for local testing
+    groq_api_key = "" # Or get it from st.text_input, etc.
+
+
+llm = ChatGroq(
+    model_name="llama3-8b-8192", # Or "llama3-70b-8192"
+    groq_api_key=groq_api_key
+)
+
 # --- UI Configuration ---
 st.set_page_config(page_title="Fuad's AI", page_icon="🤖")
 
@@ -51,22 +67,6 @@ def load_and_process_knowledge_base():
     return vectorstore
 
 vectorstore = load_and_process_knowledge_base()
-
-# --- LLM Setup using Groq and Streamlit Secrets ---
-try:
-    # This is the standard way to access secrets in a deployed app
-    groq_api_key = st.secrets["GROQ_API_KEY"]
-except FileNotFoundError:
-    # Fallback for local development if you don't have a secrets file
-    st.info("Groq API Key not found in secrets. Please add it to your Streamlit secrets.")
-    # You can optionally use an environment variable or input for local testing
-    groq_api_key = "" # Or get it from st.text_input, etc.
-
-
-llm = ChatGroq(
-    model_name="llama3-8b-8192", # Or "llama3-70b-8192"
-    groq_api_key=groq_api_key
-)
 
 # --- LLM and Conversational Chain Setup ---
 # llm = Ollama(model="llama3.2")
